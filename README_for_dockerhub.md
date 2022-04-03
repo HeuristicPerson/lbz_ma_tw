@@ -1,4 +1,12 @@
-# ListenBrainz To Twitter (lbz2twitter)
+![](https://raw.githubusercontent.com/HeuristicPerson/pod_dl/v1.x.dev/images/logo-grey_and_green.png)
+
+# ListenBrainz to Twitter
+
+## >>> First the most important thing <<< ##
+
+You can invite me to a **[☕ Ko-Fi](https://ko-fi.com/zipzop)**. It'll warm my heart for at least 10 minutes... which is much more than nothing!
+
+## Introduction
 
 "ListenBrainz to Twitter" (or just **lbz2twitter**) is a small script that reads
 the music listening statistics from a [ListenBrainz](https://listenbrainz.org/)
@@ -13,7 +21,7 @@ ListenBrainz account on 15th of month A, you need to wait until 4th of month A+1
 to post your most popular albums from month A.
 
 
-# Configuration
+## Configuration
  
 **#TODO:** Improve configuration documentation.
 
@@ -22,7 +30,7 @@ straightforward for anybody with Docker containers background to download the
 tool, figure out the available environment variables and their meaning.
 
 
-### Environment variables ###
+### Environment variables
 
   * `UID` User ID of the user running the tool (1000 by default).
   * `GID` Group ID of the user running the tool (1000 by default).
@@ -50,7 +58,7 @@ tool, figure out the available environment variables and their meaning.
   * `TZ` (default "Europe/London") Timezone to be used as reference.
 
 
-# Special Thanks
+## Special Thanks
 
   * To [ListenBrainz](https://listenbrainz.org/) for providing the service to
     log user listening habits and derived statistics.
