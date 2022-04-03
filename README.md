@@ -16,6 +16,7 @@ to post your most popular albums from month A.
 # Configuration
  
 **#TODO:** Write configuration documentation.
+
 **#TODO:** Automate the creation and publishing of a Docker image (in DockerHub)
 using GitHub automations.
 
@@ -33,4 +34,4 @@ tool, figure out the available environment variables and their meaning.
   * To MusicBrainz (yes, again) for [Picard](https://picard.musicbrainz.org/), a
     **marvelous** open source ID3 tagging tool to verify, validate and tag your
     audio files. In the particular context of **lbz2twitter**, it ensures that
-    proper album is identified in ListenBrainz when playing a track.
+    proper album is identified in ListenBrainz when playing a track. 
