@@ -77,6 +77,10 @@ def _build_tweet_text(plo_releases):
                                     o_release.u_release_name,
                                     o_release.u_artist_name)
 
+        # Adding an extra hashtag, so it's easier to track the entries
+        #-------------------------------------------------------------
+        u_msg += '\n#top_albums'
+
     return u_msg.strip()
 
 

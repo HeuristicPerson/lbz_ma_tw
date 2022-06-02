@@ -15,7 +15,7 @@ COPY scripts/run.sh .
 
 # Installation of packages
 #=======================================================================================================================
-RUN apk add --update --no-cache curl=7.80.0-r0 && \
+RUN apk add --update --no-cache curl && \
     pip install --no-cache-dir -r /app/lbz2twitter/python-deps.txt && \
     rm -f /app/lbz2twitter/python-deps.txt
 
