@@ -9,7 +9,7 @@ import os
 #=======================================================================================================================
 # Program name and version
 u_PRG = 'ListenBrainz to Twitter'
-u_VER = 'v1.0.2022-06-02.dev'
+u_VER = 'v1.0.2022-10-04.dev'
 
 # Number of chars for fixed-width elements
 i_WIDTH = 45

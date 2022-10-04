@@ -15,15 +15,37 @@ import libs.twitter as twitter
 #=======================================================================================================================
 def _filter_unverified_releases(plo_releases):
     """
-    Function to remove unverified releases (releases without a proper MusicBrainz Id) from a list.
+    Function to remove unverified releases (releases without a proper MusicBrainz Id.) from a list.
+    :param plo_releases:
+    :type plo_releases: List[libs.lb_mb_data.Release]
+
+    :return:
+    :rtype: List[libs.lb_mb_data.Release]
+    """
+    lo_verified_releases = [o_release for o_release in plo_releases if o_release.u_release_mbid]
+    return lo_verified_releases
+
+
+def _filter_duplicated_releases(plo_releases):
+    """
+    Function to remove duplicated releases (same id) from a list of releases.
+
     :param plo_releases:
     :type plo_releases: List[libs.lb_mb_data.Release]
 
     :return:
     :rtype List[libs.lb_mb_data.Release]
     """
-    lo_verified_releases = [o_release for o_release in plo_releases if o_release.u_release_mbid]
-    return lo_verified_releases
+    # We need to keep the order, so mapping the objects to a dictionary where the unique key is the attribute we don't
+    # want to have repeated is not an option. So I need to use "cheap" workaround.
+    lu_used_keys = []
+    lo_filtered_releases = []
+    for o_release in plo_releases:
+        if o_release.u_release_mbid not in lu_used_keys:
+            lo_filtered_releases.append(o_release)
+            lu_used_keys.append(o_release.u_release_mbid)
+
+    return lo_filtered_releases
 
 
 def _build_tweet_text(plo_releases):
@@ -167,6 +189,11 @@ if __name__ == '__main__':
                                              pi_offset=0,
                                              pu_time_range='month')
     print(' DONE!')
+
+    # Filtering duplicated entries
+    #-----------------------------
+    # Somehow, listenbrainz sometimes points twice to the same release, so I filter out duplicated release URLs
+    lo_releases = _filter_duplicated_releases(lo_releases)
 
     # Filtering out unverified albums (totally wanted side effect: Podcasts won't be taken into account)
     #---------------------------------------------------------------------------------------------------
