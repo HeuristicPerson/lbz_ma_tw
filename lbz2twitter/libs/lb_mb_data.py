@@ -58,10 +58,20 @@ class Release:
         """
         self.i_listen_count = pdx_json['listen_count']
         self.lu_artist_mbids = pdx_json['artist_mbids']
-        self.u_artist_msid = pdx_json['artist_msid']
+
+        try:
+            self.u_artist_msid = pdx_json['artist_msid']
+        except KeyError:
+            pass
+
         self.u_artist_name = pdx_json['artist_name']
         self.u_release_mbid = pdx_json['release_mbid']
-        self.u_release_msid = pdx_json['release_msid']
+
+        try:
+            self.u_release_msid = pdx_json['release_msid']
+        except KeyError:
+            pass
+        
         self.u_release_name = pdx_json['release_name']
 
     def fetch_mb_covers(self):
