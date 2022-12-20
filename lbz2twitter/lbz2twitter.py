@@ -5,6 +5,9 @@ import dateutil.relativedelta
 import locale
 import os
 
+# TODO: remove import and create my own exception in twitter.py library
+import tweepy
+
 import libs.lb_mb_data as lb_mb_data
 import libs.cons as cons
 import libs.download as download
@@ -48,7 +51,7 @@ def _filter_duplicated_releases(plo_releases):
     return lo_filtered_releases
 
 
-def _build_tweet_text(plo_releases):
+def _build_tweet_text(plo_releases, ps_interval='month'):
     """
     Function to build the text of the tweet with the top albums.
 
@@ -58,52 +61,58 @@ def _build_tweet_text(plo_releases):
     :return: The text with the top albums
     :rtype Str
     """
-    u_msg = ''
+    s_msg = ''
 
     # Dictionary with heading and album line in different locales
     #------------------------------------------------------------
-    du_heading = {
+    ds_heading = {
         'en_GB.UTF-8': 'Top %s albums in %s\n',
         'es_ES.UTF-8': 'Top %s discos de %s\n',
     }
-    du_album_line = {
+    ds_album_line = {
         'en_GB.UTF-8': '%s. %s (by %s)\n',
         'es_ES.UTF-8': '%s. %s (por %s)\n'
     }
 
     # Setting the locale and using en_GB.UTF-8 when the chosen option is not valid
     #-----------------------------------------------------------------------------
-    if (cons.u_LOCALE in du_heading) and (cons.u_LOCALE in du_album_line):
-        u_locale = cons.u_LOCALE
+    if (cons.s_LOCALE in ds_heading) and (cons.s_LOCALE in ds_album_line):
+        s_locale = cons.s_LOCALE
     else:
-        print('WARNING: Locale "%s" not found, using "en_GB.UTF-8" instead' % cons.u_LOCALE)
-        u_locale = 'en_GB.UTF-8'
+        print('WARNING: Locale "%s" not found, using "en_GB.UTF-8" instead' % cons.s_LOCALE)
+        s_locale = 'en_GB.UTF-8'
 
-    locale.setlocale(locale.LC_TIME, cons.u_LOCALE)
+    locale.setlocale(locale.LC_TIME, cons.s_LOCALE)
 
     if plo_releases:
-        u_heading_tpl = du_heading[u_locale]
-        u_album_tpl = du_album_line[u_locale]
+        s_heading_tpl = ds_heading[s_locale]
+        s_album_tpl = ds_album_line[s_locale]
 
-        # Getting the name of the last month
-        #-----------------------------------
-        o_last_month = datetime.datetime.now() - dateutil.relativedelta.relativedelta(months=1)
-        u_last_month = o_last_month.strftime('%B')
+        # Getting the name of the last time interval
+        #-------------------------------------------
+        if ps_interval == 'month':
+            o_last_month = datetime.datetime.now() - dateutil.relativedelta.relativedelta(months=1)
+            s_last_interval = o_last_month.strftime('%B')
+        elif ps_interval == 'year':
+            o_last_year = datetime.datetime.now() - dateutil.relativedelta.relativedelta(years=1)
+            s_last_interval = o_last_year.strftime('%Y')
+        else:
+            raise ValueError('Invalid interval name, allowed values are "month", and "year"')
 
         # Building the heading message
         #-----------------------------
-        u_msg += u_heading_tpl % (cons.i_LB_VERIFIED, u_last_month)
+        s_msg += s_heading_tpl % (cons.i_LB_VERIFIED, s_last_interval)
 
         for i_release, o_release in enumerate(plo_releases, start=1):
-            u_msg += u_album_tpl % (i_release,
+            s_msg += s_album_tpl % (i_release,
                                     o_release.u_release_name,
                                     o_release.u_artist_name)
 
         # Adding an extra hashtag, so it's easier to track the entries
         #-------------------------------------------------------------
-        u_msg += '\n#top_albums'
+        s_msg += '\n#top_albums'
 
-    return u_msg.strip()
+    return s_msg.strip()
 
 
 def _tweet_releases(plo_releases):
@@ -156,38 +165,30 @@ def _print_debug_msg():
         u_msg += 'i_DL_RETRIES:             %s\n' % cons.i_DL_RETRIES
         u_msg += 'i_DL_DELAY:               %s\n' % cons.i_DL_DELAY
         u_msg += '\n'
-        u_msg += 'u_LOCALE:                 %s\n' % cons.u_LOCALE
+        u_msg += 's_LOCALE:                 %s\n' % cons.s_LOCALE
         u_msg += '\n'
-        u_msg += 'u_LB_USER:                %s\n' % cons.u_LB_USER
+        u_msg += 's_LB_USER:                %s\n' % cons.s_LB_USER
         u_msg += 'i_LB_FETCH:               %s\n' % cons.i_LB_FETCH
         u_msg += 'i_LB_VERIFIED:            %s\n' % cons.i_LB_VERIFIED
         u_msg += '\n'
-        u_msg += 'u_TW_CONSUMER_KEY:        %s\n' % cons.u_TW_CONSUMER_KEY
-        u_msg += 'u_TW_CONSUMER_SECRET:     %s\n' % cons.u_TW_CONSUMER_SECRET
-        u_msg += 'u_TW_ACCESS_TOKEN:        %s\n' % cons.u_TW_ACCESS_TOKEN
-        u_msg += 'u_TW_ACCESS_TOKEN_SECRET: %s\n' % cons.u_TW_ACCESS_TOKEN_SECRET
+        u_msg += 's_TW_CONSUMER_KEY:        %s\n' % cons.s_TW_CONSUMER_KEY
+        u_msg += 's_TW_CONSUMER_SECRET:     %s\n' % cons.s_TW_CONSUMER_SECRET
+        u_msg += 's_TW_ACCESS_TOKEN:        %s\n' % cons.s_TW_ACCESS_TOKEN
+        u_msg += 's_TW_ACCESS_TOKEN_SECRET: %s\n' % cons.s_TW_ACCESS_TOKEN_SECRET
         u_msg += '~~~~~~~~~~~~~~~~~'
         print(u_msg)
 
 
-# Main code
-#=======================================================================================================================
-if __name__ == '__main__':
-    u_prg = '%s - %s' % (cons.u_PRG, cons.u_VER)
-    u_msg = '%s\n%s' % (u_prg, '='*cons.i_WIDTH)
-    print(u_msg)
-
-    _print_debug_msg()
-
+def _report(ps_period='month'):
     # Getting a high enough number of albums, so later we can keep enough verified ones
     #----------------------------------------------------------------------------------
-    u_msg = 'Fetching top %s releases from ListenBrainz...' % cons.i_LB_FETCH
-    u_msg = u_msg.ljust(cons.i_WIDTH, '.')
-    print(u_msg, end='')
-    lo_releases = lb_mb_data.get_lb_releases(pu_user=cons.u_LB_USER,
+    s_msg = 'Fetching top %s releases from ListenBrainz...' % cons.i_LB_FETCH
+    s_msg = s_msg.ljust(cons.i_WIDTH, '.')
+    print(s_msg, end='')
+    lo_releases = lb_mb_data.get_lb_releases(pu_user=cons.s_LB_USER,
                                              pi_count=cons.i_LB_FETCH,
                                              pi_offset=0,
-                                             pu_time_range='month')
+                                             pu_time_range=ps_period)
     print(' DONE!')
 
     # Filtering duplicated entries
@@ -197,31 +198,51 @@ if __name__ == '__main__':
 
     # Filtering out unverified albums (totally wanted side effect: Podcasts won't be taken into account)
     #---------------------------------------------------------------------------------------------------
-    u_msg = 'Filtering top %s verified releases...' % cons.i_LB_VERIFIED
-    u_msg = u_msg.ljust(cons.i_WIDTH, '.')
-    print(u_msg, end='')
+    s_msg = 'Filtering top %s verified releases...' % cons.i_LB_VERIFIED
+    s_msg = s_msg.ljust(cons.i_WIDTH, '.')
+    print(s_msg, end='')
     lo_releases = _filter_unverified_releases(lo_releases)[:cons.i_LB_VERIFIED]
     print(' DONE!')
 
     # Showing the text (only the text, not the covers) of the tweet about to be sent
-    #-------------------------------------------------------------------------------
-    print('-' * cons.i_WIDTH)
-    u_tweet = _build_tweet_text(lo_releases)
-    if u_tweet:
-        u_msg = u_tweet
+    # -------------------------------------------------------------------------------
+    print('\nTweet:\n')
+    s_tweet = _build_tweet_text(lo_releases)
+    if s_tweet:
+        s_msg = '\n'.join([f'  │ {s_line}' for s_line in s_tweet.splitlines(False)])
     else:
-        u_msg = '(Sorry, empty list of albums, so empty tweet)'
-    print(u_msg)
-    print('-' * cons.i_WIDTH)
+        s_msg = '(Sorry, empty list of albums, so empty tweet)'
+    print(f'{s_msg}\n')
 
     # Sending the tweet
-    #------------------
-    u_msg = 'Sending tweet (%s characters)...' % len(u_tweet)
-    u_msg = u_msg.ljust(cons.i_WIDTH, '.')
-    print(u_msg, end='')
+    # ------------------
+    s_msg = 'Sending tweet (%s characters)...' % len(s_tweet)
+    s_msg = s_msg.ljust(cons.i_WIDTH, '.')
+    print(s_msg, end='')
     if lo_releases:
-        _tweet_releases(lo_releases)
-        u_result = ' DONE!'
+        try:
+            _tweet_releases(lo_releases)
+            u_result = ' DONE!'
+        except tweepy.errors.BadRequest:
+            u_result = ' ERROR! Wrong Twitter authentication keys.'
     else:
         u_result = ' SKIPPED!'
     print(u_result)
+
+
+# Main code
+#=======================================================================================================================
+if __name__ == '__main__':
+    s_prg = '%s - %s' % (cons.s_PRG, cons.s_VER)
+    s_msg = '%s\n%s' % (s_prg, '=' * cons.i_WIDTH)
+    print(s_msg)
+
+    _print_debug_msg()
+
+    print('\nLast month report\n%s' % ('-'*cons.i_WIDTH))
+    _report(ps_period='month')
+
+    # Only launch year report if we're in January
+    if datetime.datetime.now().month == 0:
+        print('\nLast year report\n%s' % ('-'*cons.i_WIDTH))
+        _report(ps_period='year')

@@ -31,8 +31,8 @@ def tweet(pu_text, plu_images=[]):
     else:
         # [1/?] Authentication
         #---------------------
-        o_auth = tweepy.OAuthHandler(cons.u_TW_CONSUMER_KEY, cons.u_TW_CONSUMER_SECRET)
-        o_auth.set_access_token(cons.u_TW_ACCESS_TOKEN, cons.u_TW_ACCESS_TOKEN_SECRET)
+        o_auth = tweepy.OAuthHandler(cons.s_TW_CONSUMER_KEY, cons.s_TW_CONSUMER_SECRET)
+        o_auth.set_access_token(cons.s_TW_ACCESS_TOKEN, cons.s_TW_ACCESS_TOKEN_SECRET)
         o_twitter_account = tweepy.API(o_auth)
 
         if plu_images:
@@ -47,9 +47,9 @@ def tweet(pu_text, plu_images=[]):
                     break
                 except tweepy.errors.TwitterServerError:
                     time.sleep(cons.i_TW_DELAY)
-                except tweepy.errors.BadRequest:
-                    print('ERROR! Wrong Twitter authentication keys.')
-                    quit()
+                #except tweepy.errors.BadRequest:
+                #    print('ERROR! Wrong Twitter authentication keys.')
+                #    quit()
 
         else:
             for i_retry in range(cons.i_TW_RETRIES):
