@@ -10,7 +10,7 @@ echo "#                      |_|             |_|                   #"
 echo '##############################################################'
 echo ""
 
-VER=$(python -c "import sys;sys.path.append('/app/lbz2twitter/');import libs.cons as cons;print(cons.u_VER)")
+VER=$(python -c "import sys;sys.path.append('/app/lbz2twitter/');import libs.cons as cons;print(cons.s_VER)")
 
 echo "Starting zipzop/lbz2twitter:$VER"
 echo "=============================================================="

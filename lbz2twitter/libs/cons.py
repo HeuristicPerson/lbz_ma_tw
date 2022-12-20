@@ -18,9 +18,9 @@ i_WIDTH = 45
 _ts_ON_VALUES = ('1', 'true', 'on', 'yes', 'y')
 
 # Debug mode
-_u_debug = os.getenv('DEBUG', 'False')
+_s_debug = os.getenv('DEBUG', 'False')
 b_DEBUG = False
-if _u_debug.lower() in _ts_ON_VALUES:
+if _s_debug.lower() in _ts_ON_VALUES:
     b_DEBUG = True
 
 # Language configuration, used in the creation of the tweet.
