@@ -8,29 +8,29 @@ import os
 # Constants
 #=======================================================================================================================
 # Program name and version
-u_PRG = 'ListenBrainz to Twitter'
-u_VER = 'v1.0.2022-11-17.dev'
+s_PRG = 'ListenBrainz to Twitter'
+s_VER = 'v1.1.2022-12-20.dev'
 
 # Number of chars for fixed-width elements
 i_WIDTH = 45
 
 # Tuple with values than can be interpreted as a True
-_tu_ON_VALUES = ('1', 'true', 'on', 'yes', 'y')
+_ts_ON_VALUES = ('1', 'true', 'on', 'yes', 'y')
 
 # Debug mode
 _u_debug = os.getenv('DEBUG', 'False')
 b_DEBUG = False
-if _u_debug.lower() in _tu_ON_VALUES:
+if _u_debug.lower() in _ts_ON_VALUES:
     b_DEBUG = True
 
 # Language configuration, used in the creation of the tweet.
-u_LOCALE = os.getenv('LOCALE', 'en_GB.UTF-8')
+s_LOCALE = os.getenv('LOCALE', 'en_GB.UTF-8')
 
 
 # ListenBrainz constants
 #-----------------------
 # ListenBrainz user to get most popular albums from
-u_LB_USER = os.getenv('LB_USER', '')
+s_LB_USER = os.getenv('LB_USER', '')
 
 # Number of albums to get from that user
 i_LB_FETCH = int(os.getenv('LB_FETCH', '10'))
@@ -58,10 +58,10 @@ i_DL_DELAY = int(os.getenv('DL_DELAY', '5'))
 # at https://dev.twitter.com/apps (under "OAuth settings"). The access tokens can be found on your application's Details
 # page located at https://dev.twitter.com/apps (under "Your access token")
 # # "Your access token")
-u_TW_CONSUMER_KEY = os.getenv('TW_CONSUMER_KEY', '')
-u_TW_CONSUMER_SECRET = os.getenv('TW_CONSUMER_SECRET', '')
-u_TW_ACCESS_TOKEN = os.getenv('TW_ACCESS_TOKEN', '')
-u_TW_ACCESS_TOKEN_SECRET = os.getenv('TW_ACCESS_TOKEN_SECRET', '')
+s_TW_CONSUMER_KEY = os.getenv('TW_CONSUMER_KEY', '')
+s_TW_CONSUMER_SECRET = os.getenv('TW_CONSUMER_SECRET', '')
+s_TW_ACCESS_TOKEN = os.getenv('TW_ACCESS_TOKEN', '')
+s_TW_ACCESS_TOKEN_SECRET = os.getenv('TW_ACCESS_TOKEN_SECRET', '')
 
 # Number of retries when submitting a tweet
 i_TW_RETRIES = int(os.getenv('TW_RETRIES', '5'))
