@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
 import datetime
-import dateutil.relativedelta
-import locale
 import os
 
 # TODO: remove import and create my own exception in twitter.py library
@@ -12,6 +10,8 @@ import libs.lb_mb_data as lb_mb_data
 import libs.cons as cons
 import libs.download as download
 import libs.twitter as twitter
+
+import libs.releases_to_twitter as releases_to_twitter
 
 
 # Functions
@@ -51,73 +51,10 @@ def _filter_duplicated_releases(plo_releases):
     return lo_filtered_releases
 
 
-def _build_tweet_text(plo_releases, ps_interval='month'):
-    """
-    Function to build the text of the tweet with the top albums.
-
-    :param plo_releases:
-    :type plo_releases: List[Str]
-
-    :return: The text with the top albums
-    :rtype Str
-    """
-    s_msg = ''
-
-    # Dictionary with heading and album line in different locales
-    #------------------------------------------------------------
-    ds_heading = {
-        'en_GB.UTF-8': 'Top %s albums in %s\n',
-        'es_ES.UTF-8': 'Top %s discos de %s\n',
-    }
-    ds_album_line = {
-        'en_GB.UTF-8': '%s. %s (by %s)\n',
-        'es_ES.UTF-8': '%s. %s (por %s)\n'
-    }
-
-    # Setting the locale and using en_GB.UTF-8 when the chosen option is not valid
-    #-----------------------------------------------------------------------------
-    if (cons.s_LOCALE in ds_heading) and (cons.s_LOCALE in ds_album_line):
-        s_locale = cons.s_LOCALE
-    else:
-        print('WARNING: Locale "%s" not found, using "en_GB.UTF-8" instead' % cons.s_LOCALE)
-        s_locale = 'en_GB.UTF-8'
-
-    locale.setlocale(locale.LC_TIME, cons.s_LOCALE)
-
-    if plo_releases:
-        s_heading_tpl = ds_heading[s_locale]
-        s_album_tpl = ds_album_line[s_locale]
-
-        # Getting the name of the last time interval
-        #-------------------------------------------
-        if ps_interval == 'month':
-            o_last_month = datetime.datetime.now() - dateutil.relativedelta.relativedelta(months=1)
-            s_last_interval = o_last_month.strftime('%B')
-        elif ps_interval == 'year':
-            o_last_year = datetime.datetime.now() - dateutil.relativedelta.relativedelta(years=1)
-            s_last_interval = o_last_year.strftime('%Y')
-        else:
-            raise ValueError('Invalid interval name, allowed values are "month", and "year"')
-
-        # Building the heading message
-        #-----------------------------
-        s_msg += s_heading_tpl % (cons.i_LB_VERIFIED, s_last_interval)
-
-        for i_release, o_release in enumerate(plo_releases, start=1):
-            s_msg += s_album_tpl % (i_release,
-                                    o_release.u_release_name,
-                                    o_release.u_artist_name)
-
-        # Adding an extra hashtag, so it's easier to track the entries
-        #-------------------------------------------------------------
-        s_msg += '\n#top_albums'
-
-    return s_msg.strip()
-
-
-def _tweet_releases(plo_releases):
+def _tweet_releases(plo_releases, ps_period='month'):
     """
     Function to tweet the popular releases.
+
     :param plo_releases:
     :type plo_releases: List[lb_mb_data.Release]
 
@@ -144,8 +81,8 @@ def _tweet_releases(plo_releases):
             except KeyError:
                 pass
 
-        u_msg = _build_tweet_text(plo_releases)
-        b_tweet_sent = twitter.tweet(u_msg, plu_images=lu_cover_paths)
+        s_msg = releases_to_twitter.build_tweet_text(plo_releases=plo_releases, ps_period=ps_period)
+        b_tweet_sent = twitter.tweet(s_msg, plu_images=lu_cover_paths)
 
         # Deleting the files after sending the tweet
         for u_file in lu_cover_paths:
@@ -205,9 +142,9 @@ def _report(ps_period='month'):
     print(' DONE!')
 
     # Showing the text (only the text, not the covers) of the tweet about to be sent
-    # -------------------------------------------------------------------------------
+    #-------------------------------------------------------------------------------
     print('\nTweet:\n')
-    s_tweet = _build_tweet_text(lo_releases)
+    s_tweet = releases_to_twitter.build_tweet_text(lo_releases, ps_period=ps_period)
     if s_tweet:
         s_msg = '\n'.join([f'  │ {s_line}' for s_line in s_tweet.splitlines(False)])
     else:
@@ -215,13 +152,13 @@ def _report(ps_period='month'):
     print(f'{s_msg}\n')
 
     # Sending the tweet
-    # ------------------
+    #------------------
     s_msg = 'Sending tweet (%s characters)...' % len(s_tweet)
     s_msg = s_msg.ljust(cons.i_WIDTH, '.')
     print(s_msg, end='')
     if lo_releases:
         try:
-            _tweet_releases(lo_releases)
+            _tweet_releases(plo_releases=lo_releases, ps_period=ps_period)
             u_result = ' DONE!'
         except tweepy.errors.BadRequest:
             u_result = ' ERROR! Wrong Twitter authentication keys.'
@@ -243,6 +180,6 @@ if __name__ == '__main__':
     _report(ps_period='month')
 
     # Only launch year report if we're in January
-    if datetime.datetime.now().month == 0:
+    if datetime.datetime.now().month == 1:
         print('\nLast year report\n%s' % ('-'*cons.i_WIDTH))
         _report(ps_period='year')
