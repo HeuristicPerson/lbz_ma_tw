@@ -1,6 +1,6 @@
 ![](https://raw.githubusercontent.com/HeuristicPerson/pod_dl/v1.x.dev/images/logo-grey_and_green.png)
 
-# ListenBrainz to Twitter
+# ListenBrainz to Mastodon and Twitter
 
 ## >>> First the most important thing <<< ##
 
