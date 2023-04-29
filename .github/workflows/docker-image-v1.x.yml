@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: docker login
         env:
           DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -22,7 +22,7 @@ jobs:
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_USER}}/lbz2twitter:v1.x
+        run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_USER}}/lbz_ma_tw:v1.x
 
       - name: Docker Push
-        run: docker push ${{secrets.DOCKER_USER}}/lbz2twitter:v1.x
+        run: docker push ${{secrets.DOCKER_USER}}/lbz_ma_tw:v1.x

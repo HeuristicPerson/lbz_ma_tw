@@ -36,7 +36,7 @@ def tweet(pu_text, plu_images=[]):
         o_twitter_account = tweepy.API(o_auth)
 
         if plu_images:
-            for i_retry in range(cons.i_TW_RETRIES):
+            for i_retry in range(cons.i_MSG_RETRIES):
                 try:
                     li_media_ids = []
                     for u_file in plu_images:
@@ -46,18 +46,15 @@ def tweet(pu_text, plu_images=[]):
                     b_tweeted = True
                     break
                 except tweepy.errors.TwitterServerError:
-                    time.sleep(cons.i_TW_DELAY)
-                #except tweepy.errors.BadRequest:
-                #    print('ERROR! Wrong Twitter authentication keys.')
-                #    quit()
+                    time.sleep(cons.i_MSG_DELAY)
 
         else:
-            for i_retry in range(cons.i_TW_RETRIES):
+            for i_retry in range(cons.i_MSG_RETRIES):
                 try:
                     o_twitter_account.update_status(status=pu_text)
                     b_tweeted = True
                     break
                 except tweepy.errors.TwitterServerError:
-                    time.sleep(cons.i_TW_DELAY)
+                    time.sleep(cons.i_MSG_DELAY)
 
     return b_tweeted

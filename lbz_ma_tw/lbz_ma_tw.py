@@ -9,6 +9,7 @@ import tweepy
 import libs.lb_mb_data as lb_mb_data
 import libs.cons as cons
 import libs.download as download
+import libs.mastodon as mastodon
 import libs.twitter as twitter
 
 import libs.releases_to_twitter as releases_to_twitter
@@ -91,6 +92,40 @@ def _tweet_releases(plo_releases, ps_period='month'):
     return b_tweet_sent
 
 
+def _toot_releases(plo_releases, ps_period='month'):
+    """
+    Function to tweet the popular releases.
+
+    :param plo_releases:
+    :type plo_releases: List[lb_mb_data.Release]
+
+    :return: True if the Tweet was sent, False otherwise
+    :rtype Bool
+    """
+
+    # TODO: Find a way to indicate whether there were no releases found, so the empty tweet wasn't sent.
+    b_toot_sent = False
+
+    if plo_releases:
+        lu_cover_urls = []
+
+        for o_release in plo_releases:
+            try:
+                u_url = o_release.lo_covers[0].du_thumbnails['large']
+                lu_cover_urls.append(u_url)
+            except KeyError:
+                pass
+
+        s_msg = releases_to_twitter.build_tweet_text(plo_releases=plo_releases, ps_period=ps_period)
+        b_toot_sent = mastodon.toot(ps_text=s_msg,
+                                    pls_images=lu_cover_urls,
+                                    ps_instance=cons.s_MA_INSTANCE,
+                                    ps_token=cons.s_MA_TOKEN,
+                                    pb_debug=cons.b_DEBUG)
+
+    return b_toot_sent
+
+
 def _print_debug_msg():
     """
     Function to print debug information when needed.
@@ -143,28 +178,46 @@ def _report(ps_period='month'):
 
     # Showing the text (only the text, not the covers) of the tweet about to be sent
     #-------------------------------------------------------------------------------
-    print('\nTweet:\n')
-    s_tweet = releases_to_twitter.build_tweet_text(lo_releases, ps_period=ps_period)
-    if s_tweet:
-        s_msg = '\n'.join([f'  │ {s_line}' for s_line in s_tweet.splitlines(False)])
+    print('\nMessage:\n')
+    s_status_message = releases_to_twitter.build_tweet_text(lo_releases, ps_period=ps_period)
+    if s_status_message:
+        s_msg = '\n'.join([f'  │ {s_line}' for s_line in s_status_message.splitlines(False)])
     else:
         s_msg = '(Sorry, empty list of albums, so empty tweet)'
     print(f'{s_msg}\n')
 
+    # Sending the toot
+    #-----------------
+    if cons.b_MASTODON:
+        s_msg = 'Sending toot (%s characters)...' % len(s_status_message)
+        s_msg = s_msg.ljust(cons.i_WIDTH, '.')
+        print(s_msg, end='')
+        if lo_releases:
+            try:
+                _toot_releases(plo_releases=lo_releases, ps_period=ps_period)
+                s_result = ' DONE!'
+            # TODO: Make this exception more specific
+            except Exception as o_exception:
+                s_result = ' ERROR! %s' % o_exception
+        else:
+            s_result = ' SKIPPED!'
+        print(s_result)
+
     # Sending the tweet
     #------------------
-    s_msg = 'Sending tweet (%s characters)...' % len(s_tweet)
-    s_msg = s_msg.ljust(cons.i_WIDTH, '.')
-    print(s_msg, end='')
-    if lo_releases:
-        try:
-            _tweet_releases(plo_releases=lo_releases, ps_period=ps_period)
-            u_result = ' DONE!'
-        except tweepy.errors.BadRequest:
-            u_result = ' ERROR! Wrong Twitter authentication keys.'
-    else:
-        u_result = ' SKIPPED!'
-    print(u_result)
+    if cons.b_TWITTER:
+        s_msg = 'Sending tweet (%s characters)...' % len(s_status_message)
+        s_msg = s_msg.ljust(cons.i_WIDTH, '.')
+        print(s_msg, end='')
+        if lo_releases:
+            try:
+                _tweet_releases(plo_releases=lo_releases, ps_period=ps_period)
+                s_result = ' DONE!'
+            except tweepy.errors.BadRequest:
+                s_result = ' ERROR! Wrong Twitter authentication keys.'
+        else:
+            s_result = ' SKIPPED!'
+        print(s_result)
 
 
 # Main code

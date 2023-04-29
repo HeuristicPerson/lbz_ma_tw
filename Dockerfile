@@ -1,4 +1,4 @@
-FROM python:3.9-alpine
+FROM python:3.11-alpine
 
 
 # Defining the workdir
@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Copying needed files
 #=======================================================================================================================
-COPY lbz2twitter lbz2twitter
+COPY lbz_ma_tw lbz_ma_tw
 COPY config config
 COPY scripts/run.sh .
 
@@ -16,8 +16,8 @@ COPY scripts/run.sh .
 # Installation of packages
 #=======================================================================================================================
 RUN apk add --update --no-cache curl && \
-    pip install --no-cache-dir -r /app/lbz2twitter/python-deps.txt && \
-    rm -f /app/lbz2twitter/python-deps.txt
+    pip install --no-cache-dir -r /app/lbz_ma_tw/python-deps.txt && \
+    rm -f /app/lbz_ma_tw/python-deps.txt
 
 # Required by the locales
 ENV MUSL_LOCPATH="/usr/share/i18n/locales/musl"
@@ -53,6 +53,8 @@ ENV UID=1000 \
     DL_RETRIES=5 \
     DL_DELAY=5 \
     LOCALE="es_ES.UTF-8" \
+    MA_INSTANCE="" \
+    MA_TOKEN="" \
     TW_CONSUMER_KEY="" \
     TW_CONSUMER_SECRET="" \
     TW_ACCESS_TOKEN="" \
@@ -67,7 +69,7 @@ ENV UID=1000 \
 RUN addgroup -g $GID appuser && \
     adduser -D -u $UID -G appuser appuser && \
     chown -R appuser:appuser /app && \
-    chmod 500 /app/lbz2twitter/lbz2twitter.py && \
+    chmod 500 /app/lbz_ma_tw/lbz_ma_tw.py && \
     chmod 500 /app/run.sh
 
 

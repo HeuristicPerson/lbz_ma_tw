@@ -1,14 +1,14 @@
-# ListenBrainz To Twitter (lbz2twitter)
+# ListenBrainz To Mastodon And Twitter (lbz_ma_tw)
 
-"ListenBrainz to Twitter" (or just **lbz2twitter**) is a small script that reads
+"ListenBrainz to Twitter" (or just **lbz_ma_tw**) is a small script that reads
 the music listening statistics from a [ListenBrainz](https://listenbrainz.org/)
 user and posts the three most popular albums titles with their covers to
 twitter.
 
-**IMPORTANT NOTE:** **lbz2twitter** tries to publish the top albums from **last
+**IMPORTANT NOTE:** **lbz_ma_tw** tries to publish the top albums from **last
 month** and ListenBrainz updates that information on 3rd day of each month. So,
 the ListenBrainz account must have been working for some time before you're able
-to successfully run **lbz2twitter**. For example, if you start using your
+to successfully run **lbz_ma_tw**. For example, if you start using your
 ListenBrainz account on 15th of month A, you need to wait until 4th of month A+1
 to post your most popular albums from month A.
 
@@ -40,13 +40,15 @@ tool, figure out the available environment variables and their meaning.
   * `DL_DELAY` (default 5) Number of seconds between cover download retries.
   * `LOCALE` (default en_UK.UTF-8) Locale to be used when generating the tweet
     with the top albums.
-  * `TW_CONSUMER_KEY` Twitter consumer key to post the tweets.
-  * `TW_CONSUMER_SECRET` Twitter consumer secret to post the tweets.
-  * `TW_ACCESS_TOKEN` Twitter access token to post the tweets.
-  * `TW_ACCESS_TOKEN_SECRET` Twitter access token secret to post the tweets.
-  * `TW_RETRIES` (default 5) Number of retries when submitting the tweets.
-  * `TW_DELAY` (default 5) Number of seconds between tweet retries.
-  * `TW_HOUR` Hour (0-23) when top albums tweet should be submitted.
+  * `MA_INSTANCE` Mastodon instance URL.
+  * `MA_TOKEN` Mastodon token to post the messages.
+  * `TW_CONSUMER_KEY` Twitter consumer key to post the messages.
+  * `TW_CONSUMER_SECRET` Twitter consumer secret to post the messages.
+  * `TW_ACCESS_TOKEN` Twitter access token to post the messages.
+  * `TW_ACCESS_TOKEN_SECRET` Twitter access token secret to post the messages.
+  * `MSG_RETRIES` (default 5) Number of retries when submitting the messages.
+  * `MSG_DELAY` (default 5) Number of seconds between tweet retries.
+  * `MSG_HOUR` Hour (0-23) when top albums tweet should be submitted.
   * `TZ` (default "Europe/London") Timezone to be used as reference.
 
 

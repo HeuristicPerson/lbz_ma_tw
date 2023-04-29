@@ -8,11 +8,11 @@ import os
 # Constants
 #=======================================================================================================================
 # Program name and version
-s_PRG = 'ListenBrainz to Twitter'
-s_VER = 'v1.1.2023-01-07.dev'
+s_PRG = 'ListenBrainz to Mastodon and Twitter'
+s_VER = 'v1.2.2023-04-29.dev'
 
 # Number of chars for fixed-width elements
-i_WIDTH = 45
+i_WIDTH = 58
 
 # Tuple with values than can be interpreted as a True
 _ts_ON_VALUES = ('1', 'true', 'on', 'yes', 'y')
@@ -52,8 +52,8 @@ i_DL_RETRIES = int(os.getenv('DL_RETRIES', '5'))
 i_DL_DELAY = int(os.getenv('DL_DELAY', '5'))
 
 
-# Twitter constants
-#------------------
+# Mastodon and Twitter constants
+#-------------------------------
 # The constants below are used to identify yourself in Twitter and being able to submit tweets. Check the page located
 # at https://dev.twitter.com/apps (under "OAuth settings"). The access tokens can be found on your application's Details
 # page located at https://dev.twitter.com/apps (under "Your access token")
@@ -63,8 +63,20 @@ s_TW_CONSUMER_SECRET = os.getenv('TW_CONSUMER_SECRET', '')
 s_TW_ACCESS_TOKEN = os.getenv('TW_ACCESS_TOKEN', '')
 s_TW_ACCESS_TOKEN_SECRET = os.getenv('TW_ACCESS_TOKEN_SECRET', '')
 
+b_TWITTER = True
+if '' in (s_TW_CONSUMER_KEY, s_TW_CONSUMER_SECRET, s_TW_ACCESS_TOKEN, s_TW_ACCESS_TOKEN_SECRET):
+    b_TWITTER = False
+
+# Instance (URL) of mastodon and api token
+s_MA_INSTANCE = os.getenv('MA_INSTANCE', '')
+s_MA_TOKEN = os.getenv('MA_TOKEN', '')
+
+b_MASTODON = True
+if '' in (s_MA_INSTANCE, s_MA_TOKEN):
+    b_MASTODON = False
+
 # Number of retries when submitting a tweet
-i_TW_RETRIES = int(os.getenv('TW_RETRIES', '5'))
+i_MSG_RETRIES = int(os.getenv('MSG_RETRIES', '5'))
 
 # Number of seconds to wait between tweet retries
-i_TW_DELAY = int(os.getenv('TW_DELAY', '5'))
+i_MSG_DELAY = int(os.getenv('MSG_DELAY', '5'))
