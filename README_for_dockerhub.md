@@ -9,10 +9,10 @@ heart for at least 10 minutes... which is much more than nothing!
 
 ## Introduction
 
-"ListenBrainz to Twitter" (or just **lbz_ma_tw**) is a small script that reads
-the music listening statistics from a [ListenBrainz](https://listenbrainz.org/)
-user and posts the three most popular albums titles with their covers to
-twitter.
+"ListenBrainz to Mastodon and Twitter" (or just **lbz_ma_tw**) is a small script
+that reads the music listening statistics from a
+[ListenBrainz](https://listenbrainz.org/) user and posts the three most popular
+albums titles with their covers to twitter.
 
 **IMPORTANT NOTE:** **lbz_ma_tw** tries to publish the top albums from **last
 month** and ListenBrainz updates that information on 3rd day of each month. So,
