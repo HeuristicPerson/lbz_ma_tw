@@ -9,7 +9,7 @@ import os
 #=======================================================================================================================
 # Program name and version
 s_PRG = 'ListenBrainz to Mastodon and Twitter'
-s_VER = 'v1.2.2023-04-29.dev'
+s_VER = 'v1.2.2023-06-06.dev'
 
 # Number of chars for fixed-width elements
 i_WIDTH = 58

@@ -113,7 +113,7 @@ def _toot_releases(plo_releases, ps_period='month'):
             try:
                 u_url = o_release.lo_covers[0].du_thumbnails['large']
                 lu_cover_urls.append(u_url)
-            except KeyError:
+            except (IndexError, KeyError):
                 pass
 
         s_msg = releases_to_twitter.build_tweet_text(plo_releases=plo_releases, ps_period=ps_period)
