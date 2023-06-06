@@ -1,13 +1,10 @@
 """
 Library with functions to build tweets with information about releases listened.
 """
-import babel
 import datetime
 import locale
 
 import dateutil.relativedelta
-
-from . import cons
 
 
 def build_tweet_text(plo_releases, ps_period='month', ps_locale='', pi_latest=3):
@@ -92,7 +89,7 @@ def _build_tweet_text(plo_releases, ps_period='month', ps_format='normal', ps_lo
         # Building the heading message
         #-----------------------------
         try:
-            s_msg += s_heading_tpl % (cons.i_LB_VERIFIED, s_last_interval)
+            s_msg += s_heading_tpl % (pi_latest, s_last_interval)
         except TypeError:
             s_msg += s_heading_tpl % s_last_interval
 
