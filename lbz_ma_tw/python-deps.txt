@@ -1,3 +1,4 @@
+babel
 Mastodon.py
 musicbrainzngs
 pylistenbrainz

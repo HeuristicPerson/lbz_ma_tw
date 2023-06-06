@@ -63,7 +63,8 @@ def _tweet_releases(plo_releases, ps_period='month'):
     :rtype Bool
     """
 
-    # TODO: Find a way to indicate whether there were no releases found, so the empty tweet wasn't sent.
+    # TODO: Find a way to indicate whether there were no releases found, so the empty tweet wasn't sent. Do the same as
+    # it's done for toots.
     b_tweet_sent = False
 
     if plo_releases:
@@ -82,7 +83,9 @@ def _tweet_releases(plo_releases, ps_period='month'):
             except KeyError:
                 pass
 
-        s_msg = releases_to_twitter.build_tweet_text(plo_releases=plo_releases, ps_period=ps_period)
+        s_msg = releases_to_twitter.build_tweet_text(plo_releases=plo_releases,
+                                                     ps_period=ps_period,
+                                                     ps_locale=cons.s_LOCALE)
         b_tweet_sent = twitter.tweet(s_msg, plu_images=lu_cover_paths)
 
         # Deleting the files after sending the tweet
@@ -103,8 +106,8 @@ def _toot_releases(plo_releases, ps_period='month'):
     :rtype Bool
     """
 
-    # TODO: Find a way to indicate whether there were no releases found, so the empty tweet wasn't sent.
     b_toot_sent = False
+    s_error_report = ''
 
     if plo_releases:
         lu_cover_urls = []
@@ -114,16 +117,24 @@ def _toot_releases(plo_releases, ps_period='month'):
                 u_url = o_release.lo_covers[0].du_thumbnails['large']
                 lu_cover_urls.append(u_url)
             except (IndexError, KeyError):
-                pass
+                s_error_report += f'\nMissing cover:\n' \
+                                  f'  artist mbids: {o_release.lu_artist_mbids}\n' \
+                                  f'  artist msid:  {o_release.u_artist_msid}\n' \
+                                  f'  artist name:  {o_release.u_artist_name}\n' \
+                                  f'  release mbid: {o_release.u_release_mbid}\n' \
+                                  f'  release msid: {o_release.u_release_msid}\n' \
+                                  f'  release name: {o_release.u_release_name}' \
 
-        s_msg = releases_to_twitter.build_tweet_text(plo_releases=plo_releases, ps_period=ps_period)
+        s_msg = releases_to_twitter.build_tweet_text(plo_releases=plo_releases,
+                                                     ps_period=ps_period,
+                                                     ps_locale=cons.s_LOCALE)
         b_toot_sent = mastodon.toot(ps_text=s_msg,
                                     pls_images=lu_cover_urls,
                                     ps_instance=cons.s_MA_INSTANCE,
                                     ps_token=cons.s_MA_TOKEN,
                                     pb_debug=cons.b_DEBUG)
 
-    return b_toot_sent
+    return b_toot_sent, s_error_report
 
 
 def _print_debug_msg():
@@ -147,6 +158,9 @@ def _print_debug_msg():
         u_msg += 's_TW_CONSUMER_SECRET:     %s\n' % cons.s_TW_CONSUMER_SECRET
         u_msg += 's_TW_ACCESS_TOKEN:        %s\n' % cons.s_TW_ACCESS_TOKEN
         u_msg += 's_TW_ACCESS_TOKEN_SECRET: %s\n' % cons.s_TW_ACCESS_TOKEN_SECRET
+        u_msg += '\n'
+        u_msg += 's_MA_INSTANCE:            %s\n' % cons.s_MA_INSTANCE
+        u_msg += 's_MA_TOKEN:               %s\n' % cons.s_MA_TOKEN
         u_msg += '~~~~~~~~~~~~~~~~~'
         print(u_msg)
 
@@ -179,7 +193,9 @@ def _report(ps_period='month'):
     # Showing the text (only the text, not the covers) of the tweet about to be sent
     #-------------------------------------------------------------------------------
     print('\nMessage:\n')
-    s_status_message = releases_to_twitter.build_tweet_text(lo_releases, ps_period=ps_period)
+    s_status_message = releases_to_twitter.build_tweet_text(lo_releases,
+                                                            ps_period=ps_period,
+                                                            ps_locale=cons.s_LOCALE)
     if s_status_message:
         s_msg = '\n'.join([f'  │ {s_line}' for s_line in s_status_message.splitlines(False)])
     else:
@@ -194,14 +210,16 @@ def _report(ps_period='month'):
         print(s_msg, end='')
         if lo_releases:
             try:
-                _toot_releases(plo_releases=lo_releases, ps_period=ps_period)
+                b_toot, s_report = _toot_releases(plo_releases=lo_releases, ps_period=ps_period)
                 s_result = ' DONE!'
-            # TODO: Make this exception more specific
             except Exception as o_exception:
                 s_result = ' ERROR! %s' % o_exception
         else:
             s_result = ' SKIPPED!'
         print(s_result)
+
+        if s_report:
+            print(s_report)
 
     # Sending the tweet
     #------------------

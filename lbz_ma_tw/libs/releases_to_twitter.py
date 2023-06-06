@@ -1,6 +1,7 @@
 """
 Library with functions to build tweets with information about releases listened.
 """
+import babel
 import datetime
 import locale
 
@@ -9,24 +10,28 @@ import dateutil.relativedelta
 from . import cons
 
 
-def build_tweet_text(plo_releases, ps_period='month'):
+def build_tweet_text(plo_releases, ps_period='month', ps_locale='', pi_latest=3):
     """
-    Function to build a tweet about listened releases; it'll automatically try to reduce the length of the tweet so it
+    Function to build a tweet about listened releases; it'll automatically try to reduce the length of the tweet, so it
     fits into the maximum allowed spaced of 280 characters.
     """
     for s_format in ('normal', 'short', 'shorter'):
-        s_tweet_candidate = _build_tweet_text(plo_releases=plo_releases, ps_period=ps_period, ps_format=s_format)
+        s_tweet_candidate = _build_tweet_text(plo_releases=plo_releases, ps_period=ps_period, ps_format=s_format,
+                                              ps_locale=ps_locale,
+                                              pi_latest=pi_latest)
         if len(s_tweet_candidate) <= 280:
             s_tweet = s_tweet_candidate
             break
 
     else:
-        s_tweet = _build_tweet_text(plo_releases=plo_releases, ps_period=ps_period, ps_format='shorter')[:280]
-
+        s_tweet = _build_tweet_text(plo_releases=plo_releases, ps_period=ps_period, ps_format='shorter',
+                                    ps_locale=ps_locale,
+                                    pi_latest=pi_latest)
+        s_tweet = s_tweet[:280]
     return s_tweet
 
 
-def _build_tweet_text(plo_releases, ps_period='month', ps_format='normal'):
+def _build_tweet_text(plo_releases, ps_period='month', ps_format='normal', ps_locale='', pi_latest=3):
     """
     Function to build the text of the tweet with the top albums.
 
@@ -44,30 +49,30 @@ def _build_tweet_text(plo_releases, ps_period='month', ps_format='normal'):
 
     # Dictionary with heading and album line in different locales
     #------------------------------------------------------------
-    dds_heading = {'normal': {'en_GB.UTF-8': '#TopAlbums in %s\n',
-                              'es_ES.UTF-8': '#TopDiscos de %s\n'},
-                   'short': {'en_GB.UTF-8': '#TopAlbums in %s\n',
-                             'es_ES.UTF-8': '#TopDiscos de %s\n'},
+    dds_heading = {'normal':  {'en_GB.UTF-8': '#TopAlbums in %s\n',
+                               'es_ES.UTF-8': '#TopDiscos de %s\n'},
+                   'short':   {'en_GB.UTF-8': '#TopAlbums in %s\n',
+                               'es_ES.UTF-8': '#TopDiscos de %s\n'},
                    'shorter': {'en_GB.UTF-8': '#TopAlbums in %s\n',
                                'es_ES.UTF-8': '#TopDiscos de %s\n'}
                    }
-    dds_album_line = {'normal': {'en_GB.UTF-8': '%s. %s (by %s)\n',
-                                 'es_ES.UTF-8': '%s. %s (por %s)\n'},
-                      'short': {'en_GB.UTF-8': '%s %s (by %s)\n',
-                                'es_ES.UTF-8': '%s %s (por %s)\n'},
+    dds_album_line = {'normal':  {'en_GB.UTF-8': '%s. %s (by %s)\n',
+                                  'es_ES.UTF-8': '%s. %s (por %s)\n'},
+                      'short':   {'en_GB.UTF-8': '%s %s (by %s)\n',
+                                  'es_ES.UTF-8': '%s %s (por %s)\n'},
                       'shorter': {'en_GB.UTF-8': '%s %s (%s)\n',
                                   'es_ES.UTF-8': '%s %s (%s)\n'}
                       }
 
     # Setting the locale and using en_GB.UTF-8 when the chosen option is not valid
     #-----------------------------------------------------------------------------
-    if (cons.s_LOCALE in dds_heading[ps_format]) and (cons.s_LOCALE in dds_album_line[ps_format]):
-        s_locale = cons.s_LOCALE
+    if (ps_locale in dds_heading[ps_format]) and (ps_locale in dds_album_line[ps_format]):
+        s_locale = ps_locale
     else:
-        print('WARNING: Locale "%s" not found, using "en_GB.UTF-8" instead' % cons.s_LOCALE)
+        print('WARNING: Locale "%s" not found, using "en_GB.UTF-8" instead' % ps_locale)
         s_locale = 'en_GB.UTF-8'
 
-    locale.setlocale(locale.LC_TIME, cons.s_LOCALE)
+    locale.setlocale(locale.LC_TIME, ps_locale)
 
     if plo_releases:
         s_heading_tpl = dds_heading[ps_format][s_locale]
